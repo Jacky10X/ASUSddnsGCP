@@ -1,4 +1,5 @@
 #!/bin/sh
+# rg = cn or com
 
 asus_request(){
     case $mode in
@@ -8,9 +9,12 @@ asus_request(){
         "update")
             local path="ddns/update.jsp"
             ;;
+		"deregister")
+			local path="ddns/unregister.jsp"
+			;;
     esac
     local password=$(calculate_password)
-    echo $(curl --write-out %{http_code} --silent --output /dev/null --user-agent "ez-update-3.0.11b5 unknown [] (by Angus Mackay)" --basic --user $user:$password "http://ns1.asuscomm.com/$path?hostname=$host&myip=$wanIP")
+    echo $(curl --write-out %{http_code} --silent --output /dev/null --user-agent "ez-update-3.0.11b5 unknown [] (by Angus Mackay)" --basic --user $user:$password "http://ns1.asuscomm.$rg/$path?hostname=$host&myip=$wanIP")
 }
 
 calculate_password(){
@@ -25,7 +29,7 @@ get_wan_ip(){
 }
 
 is_dns_updated(){
-    local dns_resolution=$(nslookup $host ns1.asuscomm.com 2>/dev/null)
+    local dns_resolution=$(nslookup $host ns1.asuscomm.$rg 2>/dev/null)
     # check if wanIP is in nslookup result
     for token in $dns_resolution
     do
@@ -45,6 +49,9 @@ code_to_string(){
         "update")
             local log_mode="Update"
             ;;
+		"deregister")
+			local log_mode="Deregistration"
+			;;
     esac
 
     case $1 in
@@ -109,8 +116,10 @@ main(){
                 return
             fi
             ;;
+		"deregister")
+			;;
         *)
-            log "Unknown action! Allowed action: register or update"
+            log "Unknown action! Allowed action: (de)register or update"
             return
             ;;
     esac
@@ -142,13 +151,14 @@ usage(){
     echo "ASUSddns script by BigNerd95 (https://github.com/BigNerd95/ASUSddns)"
 }
 
-if [ $# -eq 5 ]
+if [ $# -eq 6 ]
 then
     user=$(strip_dots_colons $1)
     key=$2
-    host="$3.asuscomm.com"
-    mode=$4
-    output=$5
+	rg=$3
+    host="$4.asuscomm.$rg"
+    mode=$5
+    output=$6
 
     wanIP=$(get_wan_ip)
     if [ -n "${wanIP}" ]

@@ -1,4 +1,5 @@
 #!/bin/sh
+#rg = com or cn
 
 # This is the slim version of ASUSddns script
 # PROS:
@@ -20,18 +21,21 @@ asus_request(){
         "update")
             local path="ddns/update.jsp"
             ;;
+		"deregister")
+			local path="ddns/unregister.jsp"
+			;;
     esac
 
-    echo $(echo -e -n "GET /$path?hostname=$host&myip=$wanIP HTTP/1.1\r\nHost: ns1.asuscomm.com\r\nAuthorization: Basic $user_base64\r\n\r\n" | nc -w 5 ns1.asuscomm.com 80 | head -1 | cut -d ' ' -f 2)
+    echo $(echo -e -n "GET /$path?hostname=$host&myip=$wanIP HTTP/1.0\r\nHost: ns1.asuscomm.$rg\r\nAuthorization: Basic $user_base64\r\n\r\n" | nc -w 5 ns1.asuscomm.$rg 80 | head -1 | cut -d ' ' -f 2)
 }
 
 get_wan_ip(){
-    echo $(echo -e -n "GET / HTTP/1.1\r\nHost: api.ipify.org\r\n\r\n" | nc -w 5 api.ipify.org 80 | tail -1)
+    echo $(echo -e -n "GET / HTTP/1.0\r\nHost: api.ipify.org\r\n\r\n" | nc -w 5 api.ipify.org 80 | tail -1)
     #echo $(ifconfig -a $(nvram get pppoe_ifname) 2>/dev/null | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
 }
 
 is_dns_updated(){
-    local dns_resolution=$(nslookup $host ns1.asuscomm.com 2>/dev/null)
+    local dns_resolution=$(nslookup $host ns1.asuscomm.$rg 2>/dev/null)
     # check if wanIP is in nslookup result
     for token in $dns_resolution
     do
@@ -51,6 +55,9 @@ code_to_string(){
         "update")
             local log_mode="Update"
             ;;
+		"deregister")
+			local log_mode="Deregistration"
+			;;
     esac
 
     case $1 in
@@ -111,8 +118,10 @@ main(){
                 return
             fi
             ;;
+		"deregister")
+			;;
         *)
-            log "Unknown action! Allowed action: register or update"
+            log "Unknown action! Allowed action: (de)register or update"
             return
             ;;
     esac
@@ -148,12 +157,13 @@ usage(){
     echo "ASUSddns slim script by BigNerd95 (https://github.com/BigNerd95/ASUSddns/tree/master/slim)"
 }
 
-if [ $# -eq 4 ]
+if [ $# -eq 5 ]
 then
     user_base64=$1
-    host="$2.asuscomm.com"
-    mode=$3
-    output=$4
+	rg=$2
+    host="$3.asuscomm.$rg"
+    mode=$4
+    output=$5
 
     wanIP=$(get_wan_ip)
     if [ -n "${wanIP}" ]
