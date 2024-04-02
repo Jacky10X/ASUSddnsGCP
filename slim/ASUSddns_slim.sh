@@ -1,6 +1,6 @@
 #!/bin/sh
-#rg = com or cn
 
+#rg = com or cn
 # This is the slim version of ASUSddns script
 # PROS:
 #   - doesn't require curl (http requests implemented with netcat)
@@ -17,20 +17,25 @@ asus_request(){
     case $mode in
         "register")
             local path="ddns/register.jsp"
+			local action="myip=$wanIP"
             ;;
         "update")
             local path="ddns/update.jsp"
+			local action="myip=$wanIP"
             ;;
 		"deregister")
-			local path="ddns/unregister.jsp"
+			local path="ddns/register.jsp"
+			local action="action=unregister"
 			;;
     esac
 
-    echo $(echo -e -n "GET /$path?hostname=$host&myip=$wanIP HTTP/1.0\r\nHost: ns1.asuscomm.$rg\r\nAuthorization: Basic $user_base64\r\n\r\n" | nc -w 5 ns1.asuscomm.$rg 80 | head -1 | cut -d ' ' -f 2)
+    echo $(echo -e -n "GET /$path?hostname=$host&$action HTTP/1.1\r\nHost: ns1.asuscomm.$rg\r\nAuthorization: Basic $user_base64\r\n\r\n" | nc -w 5 ns1.asuscomm.$rg 80 | head -1 | cut -d ' ' -f 2)
+	echo $(echo -e -n "HEAD / HTTP/1.1\nHost: ns1.asuscomm.$rg\nConnection: close\r\n" | nc ns1.asuscomm.$rg)
 }
 
 get_wan_ip(){
-    echo $(echo -e -n "GET / HTTP/1.0\r\nHost: api.ipify.org\r\n\r\n" | nc -w 5 api.ipify.org 80 | tail -1)
+    echo $(echo -e -n "GET / HTTP/1.1\r\nHost: api.ipify.org\r\n\r\n" | nc -w 5 api.ipify.org 80 | tail -1)
+	echo $(echo -e -n "HEAD / HTTP/1.1\nHost: api.ipify.org\nConnection: close\r\n" | nc api.ipify.org)
     #echo $(ifconfig -a $(nvram get pppoe_ifname) 2>/dev/null | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
 }
 

@@ -1,20 +1,23 @@
 #!/bin/sh
-# rg = cn or com
 
+#rg = cn or com
 asus_request(){
     case $mode in
         "register")
             local path="ddns/register.jsp"
+			local action="myip=$wanIP"
             ;;
         "update")
             local path="ddns/update.jsp"
+			local action="myip=$wanIP"
             ;;
 		"deregister")
-			local path="ddns/unregister.jsp"
+			local path="ddns/register.jsp"
+			local action="action=unregister"
 			;;
     esac
     local password=$(calculate_password)
-    echo $(curl --write-out %{http_code} --silent --output /dev/null --user-agent "ez-update-3.0.11b5 unknown [] (by Angus Mackay)" --basic --user $user:$password "http://ns1.asuscomm.$rg/$path?hostname=$host&myip=$wanIP")
+    echo $(curl --write-out %{http_code} --silent --output /dev/null --user-agent "ez-update-3.0.11b5 unknown [] (by Angus Mackay)" --basic --user $user:$password "http://ns1.asuscomm.$rg/$path?hostname=$host&$action" -H "Connection: close")
 }
 
 calculate_password(){
@@ -24,7 +27,7 @@ calculate_password(){
 }
 
 get_wan_ip(){
-    echo $(curl --silent http://api.ipify.org/)
+    echo $(curl --silent http://api.ipify.org/ -H "Connection: close")
     #echo $(ifconfig -a $(nvram get pppoe_ifname) 2>/dev/null | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
 }
 
