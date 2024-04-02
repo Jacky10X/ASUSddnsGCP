@@ -54,7 +54,7 @@ you only have to write `testestest`.
 `./ASUSddns.sh 00:11:22:33:44:55 12345678 com testestest update logger`
 
 #### Run update each 5 minutes
-`*/5 * * * * root /path/ASUSddns.sh 00:11:22:33:44:55 12345678 testestest update logger`
+`*/5 * * * * root /path/ASUSddns.sh 00:11:22:33:44:55 12345678 com testestest update logger`
 
 (DD-WRT: add this line in Administration -> Management -> Cron)
 
