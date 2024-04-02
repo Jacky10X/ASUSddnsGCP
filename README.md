@@ -9,7 +9,7 @@ You can enable jffs on your router or save the script on a usb drive attached to
 `chmod 777 ASUSddns.sh`  
 
 ## Usage
-`./ASUSddns.sh mac wps host (register|update) (logger|console|silent)`  
+`./ASUSddns.sh mac wps rn host (register|update) (logger|console|silent)`  
 
 #### mac
 Mac address of wan interface, it is used as username.  
@@ -21,6 +21,9 @@ To get it, launch:
 Wps pin code, it is used to calculate the password.  
 To get it, launch:  
 `nvram get secret_code`  
+
+### rn
+com or cn
 
 #### host
 Host is the hostname you want without .asuscomm.com part.  
@@ -45,10 +48,10 @@ you only have to write `testestest`.
 
 ## Examples
 #### Register a new dns (testestest.asuscomm.com)
-`./ASUSddns.sh 00:11:22:33:44:55 12345678 testestest register console`
+`./ASUSddns.sh 00:11:22:33:44:55 12345678 com testestest register console`
 
 #### Update dns
-`./ASUSddns.sh 00:11:22:33:44:55 12345678 testestest update logger`
+`./ASUSddns.sh 00:11:22:33:44:55 12345678 com testestest update logger`
 
 #### Run update each 5 minutes
 `*/5 * * * * root /path/ASUSddns.sh 00:11:22:33:44:55 12345678 testestest update logger`
