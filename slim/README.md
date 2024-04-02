@@ -11,7 +11,7 @@ This is a slim version to allow anyone to use this feature
 - you must provide the base64 of your Asus mac address
 
 # Usage
-`./ASUSddns_slim.sh mac_b64 host (register|update) (logger|console|silent)`
+`./ASUSddns_slim.sh mac_b64 rn host (register|update) (logger|console|silent)`
 
 #### mac_b64
 Mac address of wan interface, it is used as username.  
@@ -27,6 +27,9 @@ If your mac address is 00:11:22:33:44:55 you must do the following operations:
 4) `base64(001122334455:)`  encode in base64 this result (you can use https://www.base64encode.org/)
 5) `MDAxMTIyMzM0NDU1Og==`  the encoded result [this is mac_b64]
 
+#### rn
+com or cn
+
 #### host
 Host is the hostname you want without .asuscomm.com part.  
 For example if you want testestest.asucomm.com,  
@@ -34,17 +37,17 @@ you only have to write `testestest`.
 
 # Examples
 #### Register a new dns (testestest.asuscomm.com)
-`./ASUSddns_slim.sh MDAxMTIyMzM0NDU1Og== testestest register console`
+`./ASUSddns_slim.sh MDAxMTIyMzM0NDU1Og== com testestest register console`
 
 #### Update dns
-`./ASUSddns_slim.sh MDAxMTIyMzM0NDU1Og== testestest update logger`
+`./ASUSddns_slim.sh MDAxMTIyMzM0NDU1Og== com testestest update logger`
 
 #### Run update each 5 minutes
 
 ```bash
 while true
 do
-  /path/ASUSddns_slim.sh MDAxMTIyMzM0NDU1Og== testestest update logger
+  /path/ASUSddns_slim.sh MDAxMTIyMzM0NDU1Og== com testestest update logger
   sleep 300
 done
 ```
